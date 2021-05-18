@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+	<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+	<script>
+		if (typeof window.ethereum !== 'undefined') {
+		  console.log('MetaMask is installed!');
+
+
+		}
+
+
+		let web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
+		console.log(web3);
+
+/*
+  web3.eth.getAccounts(function(error, accounts) {
+    if(error) {
+      console.log(error);
+    }
+    
+    web3.eth.getBalance(accounts[0]).then(function(result){
+      console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+      
+    });
+  });
+*/
+		const connectButton = async () => {
+			
+			try {
+				const newAccounts = await ethereum.request({
+					method: 'eth_requestAccounts'
+				})
+				console.log(newAccounts);
+			} catch (error) {
+				console.error(error)
+			}
+			
+		}
+
+		const accountButton = async () => {
+			try {
+
+
+
+				const _accounts = await ethereum.request({
+		          method: 'eth_accounts',
+		        })
+		        web3.eth.getBalance(_accounts[0]).then(function(result){
+      console.log( "Balance : " ,web3.utils.fromWei(result, 'ether'));
+      
+    });
+				console.log(_accounts	);
+			} catch (error) {
+				console.error(error)
+			}
+		}
+
+	</script>
+
+
+</head>
+<body>
+	<button class="btn btn-primary btn-lg btn-block mb-3" onClick="connectButton()" > Connect </button>
+	<button class="btn btn-primary btn-lg btn-block mb-3" onClick="accountButton()" > Account </button>
+
+</body>
+</html>
