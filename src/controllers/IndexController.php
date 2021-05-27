@@ -54,7 +54,9 @@ class IndexController extends Controller {
 
 
 // QmfYEdMmtzTtAYci3mmku94bAzYFqUFGduTqGZiqgxPdTV
-
+        $url = 'http://127.0.0.1:5001';
+        $url = 'https://ipfs.infura.io:5001';
+        $folderName = 'test3';
 
         $fileNames = $this->scanDirectories($compAL);
         echo "<pre>";print_r($fileNames);
@@ -65,28 +67,30 @@ class IndexController extends Controller {
                 'file' => "@".$fileName
             ];
 
-            $resp = $curl->post('http://127.0.0.1:5001/api/v0/add', $arg);
+            $resp = $curl->post($url.'/api/v0/add', $arg);
 
             echo $resp."<BR><BR>";
         }
 
+        
 
+exit;
 
-
-
-        $resp = $curl->post('http://127.0.0.1:5001/api/v0/files/mkdir?arg=/test1/images&parents=true');
+        $resp = $curl->post($url.'/api/v0/files/mkdir?arg=/$folderName/images&parents=true');
 
         echo "<pre>";print_r($resp);
 
 
-        $resp = $curl->post('http://127.0.0.1:5001/api/v0/files/cp?arg=/ipfs/QmUoXSbfqmvLaHD1Bpta6YgBWYBL656QpNZXGyDWAnSNpz&arg=/test1/index.html');
+
+
+        $resp = $curl->post($url.'/api/v0/files/cp?arg=/ipfs/QmUoXSbfqmvLaHD1Bpta6YgBWYBL656QpNZXGyDWAnSNpz&arg=/$folderName/index.html');
         echo "<pre>";print_r($resp);
-        $resp = $curl->post('http://127.0.0.1:5001/api/v0/files/cp?arg=/ipfs/QmdJY8hopM99ZscVrNYaeDEScMTU1Ea4Q8RzvXSRjJ6ANt&arg=/test1/images/nico1.jpeg');
+        $resp = $curl->post($url.'/api/v0/files/cp?arg=/ipfs/QmdJY8hopM99ZscVrNYaeDEScMTU1Ea4Q8RzvXSRjJ6ANt&arg=/$folderName/images/nico1.jpeg');
         echo "<pre>";print_r($resp);
-        $resp = $curl->post('http://127.0.0.1:5001/api/v0/files/cp?arg=/ipfs/QmPPKy8kdfEWqSqdRFdPcFF5svqZ9NBi8UC1tZDmq1B94D&arg=/test1/images/nico2.jpeg');
+        $resp = $curl->post($url.'/api/v0/files/cp?arg=/ipfs/QmPPKy8kdfEWqSqdRFdPcFF5svqZ9NBi8UC1tZDmq1B94D&arg=/$folderName/images/nico2.jpeg');
         echo "<pre>";print_r($resp);
 
-        $resp = $curl->post('http://127.0.0.1:5001/api/v0/files/stat?arg=/test1');
+        $resp = $curl->post($url.'/api/v0/files/stat?arg=/$folderName');
         echo "<pre>";print_r($resp);
 
         exit;
@@ -157,5 +161,68 @@ class IndexController extends Controller {
 
         echo json_encode($layout);
     }
+
+    public function actionUpload() {
+
+        $curl = new Curl();
+
+        
+
+        $url = 'https://ipfs.infura.io:5001';
+        //$url = 'http://127.0.0.1:5001';
+
+        $arg = [
+                'file' => "@".$_FILES['file']['tmp_name']
+        ];
+
+        $resp = $curl->post($url.'/api/v0/add?wrap-with-directory=true', $arg);
+        //echo "<pre>";print_r($_FILES);
+        //$response['source'] = 'https://static.wikia.nocookie.net/wikimemia/images/a/af/Me_Gusta.png';
+        //echo "<pre>";print_r(json_decode($resp, true));
+        $hashes = explode("\n",$resp);
+        $ipfsResponse  = json_decode($hashes[0], true);
+        //$response['source'] = "https://cloudflare-ipfs.com/ipfs/$resp['Hash']";
+        //echo "<pre>";print_r($ipfsResponse);
+        $response['source'] = "https://ipfs.io/ipfs/".$ipfsResponse['Hash'];
+        echo json_encode($response);
+    }
+
+    public function actionUploadMetaAndSecret() {
+        $data = json_decode(file_get_contents('php://input'), true);    
+        echo "<pre>";print_r($data);
+
+
+        $metadata['name'] = $data['name'];
+        $metadata['image'] = $data['image'];
+        $metadata['external_link'] = $data['external_link'];
+        $metadata['seller_fee_basis_points'] = $data['seller_fee_basis_points'];
+        $metadata['fee_recipient'] = $data['fee_recipient'];
+
+        $arg = [
+                'path' => "@test.json",
+                'content' => json_encode($metadata)
+        ];
+
+        $url = 'https://ipfs.infura.io:5001';
+        $curl = new Curl();
+        $resp = $curl->post($url.'/api/v0/add?wrap-with-directory=true', $arg);
+
+
+
+        echo $resp;
+
+        /*
+        if (isset($data['images']) && !empty($data['images'])) {
+            $ipfsImages = [];
+            foreach ($data['images']) {
+                
+            }
+        }
+        */
+        
+
+    }
+
+    
 
 }
